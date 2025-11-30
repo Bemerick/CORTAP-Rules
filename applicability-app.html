@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FTA Comprehensive Review - Applicability Assessment</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .step {
+            display: none;
+        }
+
+        .step.active {
+            display: block;
+        }
+
+        .upload-section {
+            text-align: center;
+            padding: 40px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            margin-bottom: 30px;
+        }
+
+        .upload-section h2 {
+            margin-bottom: 20px;
+            color: #667eea;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+
+        .file-input-wrapper input[type="file"] {
+            display: none;
+        }
+
+        .file-input-label {
+            display: inline-block;
+            padding: 15px 40px;
+            background: #667eea;
+            color: white;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .file-input-label:hover {
+            background: #5568d3;
+        }
+
+        .file-status {
+            margin-top: 15px;
+            font-size: 0.95rem;
+            color: #28a745;
+        }
+
+        .question-container {
+            margin-bottom: 30px;
+            padding: 25px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+        }
+
+        .question-container label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 15px;
+            font-size: 1.05rem;
+            color: #333;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .radio-option input[type="radio"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .radio-option label {
+            margin: 0;
+            font-weight: 400;
+            cursor: pointer;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .checkbox-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .checkbox-option input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .checkbox-option label {
+            margin: 0;
+            font-weight: 400;
+            cursor: pointer;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: space-between;
+            margin-top: 40px;
+        }
+
+        .btn {
+            padding: 15px 40px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .results-summary {
+            background: #e7f3ff;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            border-left: 4px solid #0066cc;
+        }
+
+        .results-summary h2 {
+            color: #0066cc;
+            margin-bottom: 15px;
+        }
+
+        .results-summary p {
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+        }
+
+        .section-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+            transition: box-shadow 0.3s;
+        }
+
+        .section-card:hover {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .section-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .section-id {
+            background: #667eea;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .section-purpose {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .sub-area {
+            background: #f8f9fa;
+            border-left: 4px solid #28a745;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+        }
+
+        .sub-area-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .sub-area-id {
+            background: #28a745;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .field-label {
+            font-weight: 600;
+            color: #555;
+            margin-top: 12px;
+            margin-bottom: 6px;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .field-value {
+            color: #333;
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+
+        .indicator-item {
+            background: white;
+            padding: 12px;
+            margin-bottom: 8px;
+            border-radius: 6px;
+            border-left: 3px solid #667eea;
+        }
+
+        .indicator-id {
+            font-weight: 600;
+            color: #667eea;
+            margin-right: 8px;
+        }
+
+        .deficiency-item {
+            background: #fff3cd;
+            padding: 12px;
+            margin-bottom: 8px;
+            border-radius: 6px;
+            border-left: 3px solid #ffc107;
+        }
+
+        .deficiency-code {
+            font-weight: 600;
+            color: #856404;
+            margin-right: 8px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 1.2rem;
+            color: #667eea;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #f5c6cb;
+            margin-bottom: 20px;
+        }
+
+        .progress-indicator {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+        }
+
+        .progress-step {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            color: #999;
+        }
+
+        .progress-step.active {
+            color: #667eea;
+        }
+
+        .progress-step.completed {
+            color: #28a745;
+        }
+
+        .progress-circle {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+        }
+
+        .progress-step.active .progress-circle {
+            background: #667eea;
+            color: white;
+        }
+
+        .progress-step.completed .progress-circle {
+            background: #28a745;
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .radio-group {
+                flex-direction: column;
+            }
+
+            .progress-indicator {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>FTA Comprehensive Review</h1>
+            <p>Applicability & Eligibility Assessment Tool</p>
+        </div>
+
+        <div class="content">
+            <!-- Step 1: Upload -->
+            <div id="step-upload" class="step active">
+                <div class="upload-section">
+                    <h2>Upload FTA Comprehensive Review Data</h2>
+                    <p style="margin-bottom: 20px; color: #666;">Please select the FTA_Complete_Extraction.json file to begin the assessment.</p>
+                    <div class="file-input-wrapper">
+                        <input type="file" id="fileInput" accept=".json">
+                        <label for="fileInput" class="file-input-label">Choose File</label>
+                    </div>
+                    <div id="fileStatus" class="file-status"></div>
+                </div>
+            </div>
+
+            <!-- Step 2: Questionnaire -->
+            <div id="step-questionnaire" class="step">
+                <div class="progress-indicator">
+                    <div class="progress-step completed">
+                        <div class="progress-circle">✓</div>
+                        <span>Upload</span>
+                    </div>
+                    <div class="progress-step active">
+                        <div class="progress-circle">2</div>
+                        <span>Assessment</span>
+                    </div>
+                    <div class="progress-step">
+                        <div class="progress-circle">3</div>
+                        <span>Results</span>
+                    </div>
+                </div>
+
+                <h2 style="margin-bottom: 30px; color: #333;">Project Applicability Assessment</h2>
+                <p style="margin-bottom: 30px; color: #666; font-size: 1.05rem;">Please answer the following questions about your audit project to determine which sections and sub-areas are applicable.</p>
+
+                <form id="questionnaireForm">
+                    <!-- Questions will be dynamically inserted here -->
+                </form>
+
+                <div class="button-group">
+                    <button type="button" class="btn btn-secondary" onclick="goToStep('upload')">Back</button>
+                    <button type="button" class="btn btn-primary" onclick="generateResults()">Generate Results</button>
+                </div>
+            </div>
+
+            <!-- Step 3: Results -->
+            <div id="step-results" class="step">
+                <div class="progress-indicator">
+                    <div class="progress-step completed">
+                        <div class="progress-circle">✓</div>
+                        <span>Upload</span>
+                    </div>
+                    <div class="progress-step completed">
+                        <div class="progress-circle">✓</div>
+                        <span>Assessment</span>
+                    </div>
+                    <div class="progress-step active">
+                        <div class="progress-circle">3</div>
+                        <span>Results</span>
+                    </div>
+                </div>
+
+                <div class="results-summary" id="resultsSummary">
+                    <!-- Summary will be inserted here -->
+                </div>
+
+                <div id="resultsContainer">
+                    <!-- Results will be inserted here -->
+                </div>
+
+                <div class="button-group">
+                    <button type="button" class="btn btn-secondary" onclick="goToStep('questionnaire')">Back to Assessment</button>
+                    <button type="button" class="btn btn-success" onclick="exportResults()">Export to JSON</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let ftaData = null;
+        let userAnswers = {};
+        let applicableItems = [];
+
+        // File upload handler
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    try {
+                        ftaData = JSON.parse(event.target.result);
+                        document.getElementById('fileStatus').innerHTML = `✓ File loaded successfully: ${file.name} (${ftaData.metadata.total_sections} sections)`;
+                        setTimeout(() => {
+                            generateQuestionnaire();
+                            goToStep('questionnaire');
+                        }, 1000);
+                    } catch (error) {
+                        document.getElementById('fileStatus').innerHTML = `<span style="color: #dc3545;">✗ Error parsing JSON file: ${error.message}</span>`;
+                    }
+                };
+                reader.readAsText(file);
+            }
+        });
+
+        function goToStep(stepName) {
+            document.querySelectorAll('.step').forEach(step => step.classList.remove('active'));
+            document.getElementById(`step-${stepName}`).classList.add('active');
+            window.scrollTo(0, 0);
+        }
+
+        function generateQuestionnaire() {
+            const form = document.getElementById('questionnaireForm');
+            form.innerHTML = '';
+
+            // Generate questions based on applicability patterns
+            const questions = [
+                {
+                    id: 'recipient_type',
+                    label: 'What type of recipient is this project?',
+                    type: 'radio',
+                    options: ['All recipients', 'State recipient', 'Non-state recipient']
+                },
+                {
+                    id: 'federal_assistance_amount',
+                    label: 'What is the total Federal assistance expenditure amount in the fiscal year?',
+                    type: 'radio',
+                    options: ['Less than $750,000', '$750,000 or more']
+                },
+                {
+                    id: 'has_subrecipients',
+                    label: 'Does the recipient have subrecipients?',
+                    type: 'radio',
+                    options: ['Yes', 'No']
+                },
+                {
+                    id: 'has_contractors_lessees',
+                    label: 'Does the recipient have management or operations contractors and lessees?',
+                    type: 'radio',
+                    options: ['Yes', 'No']
+                },
+                {
+                    id: 'tier_level',
+                    label: 'What tier level is the recipient?',
+                    type: 'radio',
+                    options: ['Tier I', 'Tier II', 'Not applicable']
+                },
+                {
+                    id: 'fund_types',
+                    label: 'Which types of FTA funds does the recipient receive? (Select all that apply)',
+                    type: 'checkbox',
+                    options: ['Section 5310', 'Section 5311', 'Section 5307', 'Section 5337', 'Other funds']
+                },
+                {
+                    id: 'service_type',
+                    label: 'What type of service does the recipient provide? (Select all that apply)',
+                    type: 'checkbox',
+                    options: ['Fixed-route service', 'Demand response', 'Commuter rail', 'Commuter bus', 'Other']
+                },
+                {
+                    id: 'is_designated_recipient',
+                    label: 'Is this a designated recipient?',
+                    type: 'radio',
+                    options: ['Yes', 'No']
+                },
+                {
+                    id: 'has_dbe_goal',
+                    label: 'Does the recipient have a Disadvantaged Business Enterprise (DBE) overall goal?',
+                    type: 'radio',
+                    options: ['Yes', 'No']
+                },
+                {
+                    id: 'group_plan',
+                    label: 'Is the recipient part of a group plan?',
+                    type: 'radio',
+                    options: ['Participant', 'Sponsor', 'Not applicable']
+                },
+                {
+                    id: 'asset_control',
+                    label: 'Does the recipient have direct control over FTA-funded assets?',
+                    type: 'radio',
+                    options: ['Yes', 'No']
+                },
+                {
+                    id: 'is_public_operator',
+                    label: 'Is the recipient a public operator?',
+                    type: 'radio',
+                    options: ['Yes', 'No']
+                }
+            ];
+
+            questions.forEach((q, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'question-container';
+
+                const label = document.createElement('label');
+                label.textContent = q.label;
+                questionDiv.appendChild(label);
+
+                if (q.type === 'radio') {
+                    const radioGroup = document.createElement('div');
+                    radioGroup.className = 'radio-group';
+
+                    q.options.forEach(option => {
+                        const radioOption = document.createElement('div');
+                        radioOption.className = 'radio-option';
+
+                        const input = document.createElement('input');
+                        input.type = 'radio';
+                        input.name = q.id;
+                        input.value = option;
+                        input.id = `${q.id}_${option.replace(/\s+/g, '_')}`;
+
+                        const optionLabel = document.createElement('label');
+                        optionLabel.htmlFor = input.id;
+                        optionLabel.textContent = option;
+
+                        radioOption.appendChild(input);
+                        radioOption.appendChild(optionLabel);
+                        radioGroup.appendChild(radioOption);
+                    });
+
+                    questionDiv.appendChild(radioGroup);
+                } else if (q.type === 'checkbox') {
+                    const checkboxGroup = document.createElement('div');
+                    checkboxGroup.className = 'checkbox-group';
+
+                    q.options.forEach(option => {
+                        const checkboxOption = document.createElement('div');
+                        checkboxOption.className = 'checkbox-option';
+
+                        const input = document.createElement('input');
+                        input.type = 'checkbox';
+                        input.name = q.id;
+                        input.value = option;
+                        input.id = `${q.id}_${option.replace(/\s+/g, '_')}`;
+
+                        const optionLabel = document.createElement('label');
+                        optionLabel.htmlFor = input.id;
+                        optionLabel.textContent = option;
+
+                        checkboxOption.appendChild(input);
+                        checkboxOption.appendChild(optionLabel);
+                        checkboxGroup.appendChild(checkboxOption);
+                    });
+
+                    questionDiv.appendChild(checkboxGroup);
+                }
+
+                form.appendChild(questionDiv);
+            });
+        }
+
+        function collectAnswers() {
+            userAnswers = {};
+
+            // Radio buttons
+            const radioInputs = document.querySelectorAll('input[type="radio"]:checked');
+            console.log('Radio inputs checked:', radioInputs.length);
+            radioInputs.forEach(input => {
+                userAnswers[input.name] = input.value;
+            });
+
+            // Checkboxes
+            const checkboxGroups = {};
+            const checkboxInputs = document.querySelectorAll('input[type="checkbox"]:checked');
+            console.log('Checkbox inputs checked:', checkboxInputs.length);
+            checkboxInputs.forEach(input => {
+                if (!checkboxGroups[input.name]) {
+                    checkboxGroups[input.name] = [];
+                }
+                checkboxGroups[input.name].push(input.value);
+            });
+
+            Object.assign(userAnswers, checkboxGroups);
+            console.log('Collected answers:', userAnswers);
+        }
+
+        function checkApplicability(applicability) {
+            // Handle null or undefined applicability
+            if (!applicability) {
+                return false;
+            }
+
+            const applicabilityLower = applicability.toLowerCase();
+
+            // Always applicable
+            if (applicabilityLower === 'all recipients') {
+                return true;
+            }
+
+            // Check for $750,000 threshold
+            if (applicabilityLower.includes('$750,000') || applicabilityLower.includes('750,000')) {
+                if (userAnswers.federal_assistance_amount === '$750,000 or more') {
+                    return true;
+                }
+            }
+
+            // Check for subrecipients
+            if (applicabilityLower.includes('subrecipient')) {
+                if (userAnswers.has_subrecipients === 'Yes') {
+                    return true;
+                }
+            }
+
+            // Check for contractors and lessees
+            if (applicabilityLower.includes('contractor') || applicabilityLower.includes('lessee')) {
+                if (userAnswers.has_contractors_lessees === 'Yes') {
+                    return true;
+                }
+            }
+
+            // Check for Tier I
+            if (applicabilityLower.includes('tier i')) {
+                if (userAnswers.tier_level === 'Tier I') {
+                    return true;
+                }
+            }
+
+            // Check for state recipients
+            if (applicabilityLower.includes('non-state')) {
+                if (userAnswers.recipient_type === 'Non-state recipient') {
+                    return true;
+                }
+            } else if (applicabilityLower.includes('state')) {
+                if (userAnswers.recipient_type === 'State recipient') {
+                    return true;
+                }
+            }
+
+            // Check for 5310 funds
+            if (applicabilityLower.includes('5310')) {
+                if (userAnswers.fund_types && userAnswers.fund_types.includes('Section 5310')) {
+                    return true;
+                }
+            }
+
+            // Check for 5311 funds
+            if (applicabilityLower.includes('5311')) {
+                if (userAnswers.fund_types && userAnswers.fund_types.includes('Section 5311')) {
+                    return true;
+                }
+            }
+
+            // Check for designated recipients
+            if (applicabilityLower.includes('designated')) {
+                if (userAnswers.is_designated_recipient === 'Yes') {
+                    return true;
+                }
+            }
+
+            // Check for fixed-route service
+            if (applicabilityLower.includes('fixed-route')) {
+                if (userAnswers.service_type && userAnswers.service_type.includes('Fixed-route service')) {
+                    // Check if it excludes commuter rail/bus
+                    if (applicabilityLower.includes('other than commuter')) {
+                        if (!userAnswers.service_type.includes('Commuter rail') &&
+                            !userAnswers.service_type.includes('Commuter bus')) {
+                            return true;
+                        }
+                    } else {
+                        return true;
+                    }
+                }
+            }
+
+            // Check for public operators/providers
+            if (applicabilityLower.includes('public operator') || applicabilityLower.includes('public provider')) {
+                if (userAnswers.is_public_operator === 'Yes') {
+                    return true;
+                }
+            }
+
+            // Check for group plan
+            if (applicabilityLower.includes('group plan participant')) {
+                if (userAnswers.group_plan === 'Participant') {
+                    return true;
+                }
+            }
+            if (applicabilityLower.includes('group plan sponsor')) {
+                if (userAnswers.group_plan === 'Sponsor') {
+                    return true;
+                }
+            }
+
+            // Check for DBE goal
+            if (applicabilityLower.includes('overall goal')) {
+                if (userAnswers.has_dbe_goal === 'Yes') {
+                    return true;
+                }
+            }
+
+            // Check for asset control
+            if (applicabilityLower.includes('direct control')) {
+                if (userAnswers.asset_control === 'Yes') {
+                    return true;
+                }
+            }
+
+            // Check for specific fund recipients (49 CFR 26.3(a)(2))
+            if (applicabilityLower.includes('49 cfr 26.3')) {
+                // This is for specific fund types that qualify
+                if (userAnswers.fund_types && userAnswers.fund_types.length > 0) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        function generateResults() {
+            try {
+                collectAnswers();
+
+                // Validate that at least some questions were answered
+                if (Object.keys(userAnswers).length === 0) {
+                    alert('Please answer at least one question before generating results.');
+                    return;
+                }
+
+                console.log('User Answers:', userAnswers);
+                applicableItems = [];
+
+                // Process each section and sub-area
+                if (!ftaData || !ftaData.sections) {
+                    alert('Error: FTA data not loaded properly. Please reload the file.');
+                    return;
+                }
+
+                ftaData.sections.forEach(section => {
+                    const sectionData = section.section;
+                    const applicableSubAreas = [];
+
+                    if (section.sub_areas) {
+                        section.sub_areas.forEach(subArea => {
+                            if (checkApplicability(subArea.applicability)) {
+                                applicableSubAreas.push(subArea);
+                            }
+                        });
+                    }
+
+                    if (applicableSubAreas.length > 0) {
+                        applicableItems.push({
+                            section: sectionData,
+                            subAreas: applicableSubAreas
+                        });
+                    }
+                });
+
+                console.log('Applicable Items:', applicableItems.length);
+
+                displayResults();
+                goToStep('results');
+            } catch (error) {
+                console.error('Error generating results:', error);
+                alert('An error occurred while generating results: ' + error.message);
+            }
+        }
+
+        function displayResults() {
+            const summaryDiv = document.getElementById('resultsSummary');
+            const resultsDiv = document.getElementById('resultsContainer');
+
+            // Calculate totals
+            const totalSections = applicableItems.length;
+            const totalSubAreas = applicableItems.reduce((sum, item) => sum + item.subAreas.length, 0);
+
+            // Display summary
+            summaryDiv.innerHTML = `
+                <h2>Assessment Results</h2>
+                <p><strong>${totalSections}</strong> sections applicable</p>
+                <p><strong>${totalSubAreas}</strong> sub-areas applicable</p>
+            `;
+
+            // Display detailed results
+            resultsDiv.innerHTML = '';
+
+            applicableItems.forEach(item => {
+                const sectionCard = document.createElement('div');
+                sectionCard.className = 'section-card';
+
+                sectionCard.innerHTML = `
+                    <div class="section-header">
+                        <div>
+                            <div class="section-title">${item.section.title}</div>
+                        </div>
+                        <div class="section-id">${item.section.id}</div>
+                    </div>
+                    <div class="field-label">Purpose</div>
+                    <div class="field-value section-purpose">${item.section.purpose}</div>
+                `;
+
+                // Add sub-areas
+                item.subAreas.forEach(subArea => {
+                    const subAreaDiv = document.createElement('div');
+                    subAreaDiv.className = 'sub-area';
+
+                    let html = `
+                        <div class="sub-area-header">
+                            <h3 style="margin: 0; color: #333; font-size: 1.1rem;">Sub-Area ${subArea.id}</h3>
+                            <span class="sub-area-id">${subArea.id}</span>
+                        </div>
+
+                        <div class="field-label">Question</div>
+                        <div class="field-value">${subArea.question}</div>
+
+                        <div class="field-label">Basic Requirement</div>
+                        <div class="field-value">${subArea.basic_requirement}</div>
+
+                        <div class="field-label">Applicability</div>
+                        <div class="field-value">${subArea.applicability}</div>
+                    `;
+
+                    // Add indicators of compliance
+                    if (subArea.indicators_of_compliance && subArea.indicators_of_compliance.length > 0) {
+                        html += `<div class="field-label">Indicators of Compliance</div>`;
+                        subArea.indicators_of_compliance.forEach(indicator => {
+                            html += `
+                                <div class="indicator-item">
+                                    <span class="indicator-id">${indicator.indicator_id}.</span>
+                                    <span>${indicator.text}</span>
+                                </div>
+                            `;
+                        });
+                    }
+
+                    // Add deficiencies
+                    if (subArea.deficiencies && subArea.deficiencies.length > 0) {
+                        html += `<div class="field-label">Related Deficiencies</div>`;
+                        subArea.deficiencies.forEach(deficiency => {
+                            html += `
+                                <div class="deficiency-item">
+                                    <div><span class="deficiency-code">${deficiency.code}</span> ${deficiency.title}</div>
+                                </div>
+                            `;
+                        });
+                    }
+
+                    subAreaDiv.innerHTML = html;
+                    sectionCard.appendChild(subAreaDiv);
+                });
+
+                resultsDiv.appendChild(sectionCard);
+            });
+        }
+
+        function exportResults() {
+            const exportData = {
+                metadata: {
+                    export_date: new Date().toISOString(),
+                    total_sections: applicableItems.length,
+                    total_sub_areas: applicableItems.reduce((sum, item) => sum + item.subAreas.length, 0),
+                    assessment_answers: userAnswers
+                },
+                applicable_sections: applicableItems.map(item => ({
+                    section_id: item.section.id,
+                    section_title: item.section.title,
+                    section_purpose: item.section.purpose,
+                    sub_areas: item.subAreas.map(subArea => ({
+                        sub_area_id: subArea.id,
+                        sub_area_question: subArea.question,
+                        sub_area_basic_requirement: subArea.basic_requirement,
+                        applicability: subArea.applicability,
+                        indicators: subArea.indicators_of_compliance ? subArea.indicators_of_compliance.map(ind => ({
+                            indicator_id: ind.indicator_id,
+                            indicator_text: ind.text
+                        })) : [],
+                        deficiencies: subArea.deficiencies ? subArea.deficiencies.map(def => ({
+                            deficiency_code: def.code,
+                            deficiency_title: def.title,
+                            determination: def.determination,
+                            suggested_corrective_action: def.suggested_corrective_action
+                        })) : []
+                    }))
+                }))
+            };
+
+            const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `FTA_Applicability_Results_${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>
