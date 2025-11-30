@@ -31,7 +31,6 @@ services:
   - type: web
     name: fta-review
     env: static
-    plan: free
     buildCommand: "cd frontend && npm install && npm run build"
     staticPublishPath: frontend/dist
     envVars:
