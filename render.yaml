@@ -2,11 +2,9 @@ services:
   # PostgreSQL Database
   - type: pserv
     name: fta-review-db
-    env: docker
     plan: free
-    databases:
-      - name: fta_review
-        user: fta_user
+    databaseName: fta_review
+    databaseUser: fta_user
 
   # FastAPI Backend
   - type: web
