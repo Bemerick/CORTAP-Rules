@@ -10,6 +10,7 @@ services:
     env: python
     plan: starter
     buildCommand: "cd backend && pip install -r requirements.txt"
+    preDeployCommand: "chmod +x backend/init_db.sh && backend/init_db.sh"
     startCommand: "cd backend && uvicorn app.main:app --host 0.0.0.0 --port $PORT"
     envVars:
       - key: DATABASE_URL
