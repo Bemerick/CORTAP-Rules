@@ -1,10 +1,8 @@
-services:
-  # PostgreSQL Database
-  - type: pserv
-    name: fta-review-db
+databases:
+  - name: fta-review-db
     plan: free
-    databaseName: fta_review
-    databaseUser: fta_user
+
+services:
 
   # FastAPI Backend
   - type: web
