@@ -96,6 +96,23 @@ CREATE TABLE IF NOT EXISTS project_applicable_areas (
     UNIQUE(project_id, sub_area_id)
 );
 
+-- Insert sample questions if table is empty
+INSERT INTO questionnaire_questions (question_number, question_text, category)
+VALUES
+    (1, 'What type of recipient is this project?', 'General'),
+    (2, 'What is the total Federal assistance expenditure amount in the fiscal year?', 'Financial'),
+    (3, 'Does the recipient have subrecipients?', 'General'),
+    (4, 'Does the recipient have management or operations contractors and lessees?', 'Operations'),
+    (5, 'What tier level is the recipient?', 'Classification'),
+    (6, 'Which types of FTA funds does the recipient receive?', 'Funding'),
+    (7, 'What type of service does the recipient provide?', 'Service'),
+    (8, 'Is this a designated recipient?', 'Classification'),
+    (9, 'Does the recipient have a Disadvantaged Business Enterprise (DBE) overall goal?', 'Compliance'),
+    (10, 'Is the recipient part of a group plan?', 'Planning'),
+    (11, 'Does the recipient have direct control over FTA-funded assets?', 'Assets'),
+    (12, 'Is the recipient a public operator?', 'Classification')
+ON CONFLICT (question_number) DO NOTHING;
+
 EOF
 
 echo "Database initialization complete!"
