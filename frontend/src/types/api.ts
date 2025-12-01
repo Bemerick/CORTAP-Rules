@@ -88,6 +88,7 @@ export interface ProjectAnswers {
 export interface ApplicableSubArea {
   section_id: string;
   section_name: string;
+  chapter_number?: number;
   sub_area_id: string;
   question: string;
   basic_requirement: string;
@@ -105,6 +106,7 @@ export interface ProjectApplicabilityResult {
 export interface SectionLOESummary {
   section_id: string;
   section_name: string;
+  chapter_number?: number;
   sub_area_count: number;
   total_hours: number;
   avg_confidence_score: number;

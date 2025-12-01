@@ -105,10 +105,12 @@ export default function LOESummary() {
             </thead>
             <tbody>
               {summary.sections
-                .sort((a, b) => b.total_hours - a.total_hours)
+                .sort((a, b) => (a.chapter_number ?? 999) - (b.chapter_number ?? 999))
                 .map((section) => (
                   <tr key={section.section_id}>
-                    <td className="section-name">{section.section_name}</td>
+                    <td className="section-name">
+                      {section.chapter_number ? `${section.chapter_number}. ` : ''}{section.section_name}
+                    </td>
                     <td className="section-count">{section.sub_area_count}</td>
                     <td className="section-hours">
                       <strong>{section.total_hours.toFixed(2)}</strong> hours
@@ -149,13 +151,15 @@ export default function LOESummary() {
         <h3>Hours Distribution</h3>
         <div className="chart-bars">
           {summary.sections
-            .sort((a, b) => b.total_hours - a.total_hours)
+            .sort((a, b) => (a.chapter_number ?? 999) - (b.chapter_number ?? 999))
             .slice(0, 10)
             .map((section) => {
               const percentage = (section.total_hours / summary.total_hours) * 100;
               return (
                 <div key={section.section_id} className="chart-bar-row">
-                  <div className="bar-label">{section.section_name}</div>
+                  <div className="bar-label">
+                    {section.chapter_number ? `${section.chapter_number}. ` : ''}{section.section_name}
+                  </div>
                   <div className="bar-container">
                     <div
                       className="bar-fill"

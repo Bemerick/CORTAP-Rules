@@ -37,17 +37,29 @@ export default function ApplicabilityResults() {
     }
   };
 
-  const groupedBySection = (): Record<string, ApplicableSubArea[]> => {
+  const groupedBySection = (): Record<string, { chapter: number | null; subAreas: ApplicableSubArea[] }> => {
     if (!results || !results.applicable_sub_areas) return {};
 
-    return results.applicable_sub_areas.reduce((acc, subArea) => {
+    const grouped = results.applicable_sub_areas.reduce((acc, subArea) => {
       const sectionName = subArea.section_name;
       if (!acc[sectionName]) {
-        acc[sectionName] = [];
+        acc[sectionName] = {
+          chapter: subArea.chapter_number ?? null,
+          subAreas: []
+        };
       }
-      acc[sectionName].push(subArea);
+      acc[sectionName].subAreas.push(subArea);
       return acc;
-    }, {} as Record<string, ApplicableSubArea[]>);
+    }, {} as Record<string, { chapter: number | null; subAreas: ApplicableSubArea[] }>);
+
+    // Sort sections by chapter number
+    return Object.fromEntries(
+      Object.entries(grouped).sort(([, a], [, b]) => {
+        const chapterA = a.chapter ?? 999;
+        const chapterB = b.chapter ?? 999;
+        return chapterA - chapterB;
+      })
+    );
   };
 
   const getConfidenceBadgeClass = (score: number): string => {
@@ -99,10 +111,10 @@ export default function ApplicabilityResults() {
 
       {groupBy === 'section' ? (
         <div className="results-by-section">
-          {Object.entries(groupedBySection()).map(([sectionName, subAreas]) => (
+          {Object.entries(groupedBySection()).map(([sectionName, { chapter, subAreas }]) => (
             <div key={sectionName} className="section-group">
               <h3 className="section-header">
-                {sectionName}
+                {chapter ? `${chapter}. ` : ''}{sectionName}
                 <span className="section-count">({subAreas.length} areas)</span>
               </h3>
 
@@ -152,7 +164,9 @@ export default function ApplicabilityResults() {
                   </span>
                 </div>
 
-                <div className="section-tag">{subArea.section_name}</div>
+                <div className="section-tag">
+                  {subArea.chapter_number ? `${subArea.chapter_number}. ` : ''}{subArea.section_name}
+                </div>
 
                 <h4 className="sub-area-question">{subArea.question}</h4>
                 <p className="sub-area-requirement">{subArea.basic_requirement}</p>

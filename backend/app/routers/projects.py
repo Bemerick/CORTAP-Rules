@@ -186,12 +186,13 @@ def submit_project_answers(
     # Get detailed sub-area information
     sub_areas = db.query(SubArea).filter(SubArea.id.in_(applicable_sub_area_ids)).all()
 
-    # Format as ApplicableSubArea objects
+    # Format as ApplicableSubArea objects and sort by chapter number
     applicable_sub_areas = []
     for sa in sub_areas:
         applicable_sub_areas.append({
             'section_id': sa.section_id,
             'section_name': sa.section.title if sa.section else '',
+            'chapter_number': sa.section.chapter_number if sa.section else None,
             'sub_area_id': sa.id,
             'question': sa.question or '',
             'basic_requirement': sa.basic_requirement or '',
@@ -199,6 +200,9 @@ def submit_project_answers(
             'loe_confidence': sa.loe_confidence or 'medium',
             'loe_confidence_score': sa.loe_confidence_score or 0
         })
+
+    # Sort by chapter number
+    applicable_sub_areas.sort(key=lambda x: (x['chapter_number'] or 999, x['sub_area_id']))
 
     return ProjectApplicabilityResultSchema(
         project_id=project.id,
@@ -224,12 +228,13 @@ def get_project_applicable_sub_areas(project_id: int, db: Session = Depends(get_
         ProjectApplicability.is_applicable == True
     ).order_by(SubArea.section_id, SubArea.id).all()
 
-    # Format as ApplicableSubArea objects
+    # Format as ApplicableSubArea objects and sort by chapter number
     applicable_sub_areas = []
     for sa in sub_areas:
         applicable_sub_areas.append({
             'section_id': sa.section_id,
             'section_name': sa.section.title if sa.section else '',
+            'chapter_number': sa.section.chapter_number if sa.section else None,
             'sub_area_id': sa.id,
             'question': sa.question or '',
             'basic_requirement': sa.basic_requirement or '',
@@ -237,6 +242,9 @@ def get_project_applicable_sub_areas(project_id: int, db: Session = Depends(get_
             'loe_confidence': sa.loe_confidence or 'medium',
             'loe_confidence_score': sa.loe_confidence_score or 0
         })
+
+    # Sort by chapter number
+    applicable_sub_areas.sort(key=lambda x: (x['chapter_number'] or 999, x['sub_area_id']))
 
     return ProjectApplicabilityResultSchema(
         project_id=project_id,
@@ -257,6 +265,7 @@ def get_project_loe_summary(project_id: int, db: Session = Depends(get_db)):
     section_summaries = db.query(
         Section.id,
         Section.title,
+        Section.chapter_number,
         func.count(SubArea.id).label('applicable_sub_areas'),
         func.sum(SubArea.loe_hours).label('section_hours'),
         func.avg(SubArea.loe_confidence_score).label('avg_confidence')
@@ -265,14 +274,15 @@ def get_project_loe_summary(project_id: int, db: Session = Depends(get_db)):
     .filter(
         ProjectApplicability.project_id == project_id,
         ProjectApplicability.is_applicable == True
-    ).group_by(Section.id, Section.title)\
-    .order_by(func.sum(SubArea.loe_hours).desc().nullslast())\
+    ).group_by(Section.id, Section.title, Section.chapter_number)\
+    .order_by(Section.chapter_number.asc().nullslast())\
     .all()
 
     sections = [
         SectionLOESummary(
             section_id=s.id,
             section_name=s.title,
+            chapter_number=s.chapter_number,
             sub_area_count=s.applicable_sub_areas,
             total_hours=float(s.section_hours) if s.section_hours else 0.0,
             avg_confidence_score=float(s.avg_confidence) if s.avg_confidence else 0.0

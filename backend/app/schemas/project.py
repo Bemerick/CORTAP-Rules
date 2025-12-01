@@ -48,6 +48,7 @@ class ApplicableSubAreaSchema(BaseModel):
     """Simplified sub-area for applicability results"""
     section_id: str
     section_name: str
+    chapter_number: Optional[int] = None
     sub_area_id: str
     question: str
     basic_requirement: str
@@ -67,6 +68,7 @@ class SectionLOESummary(BaseModel):
     """LOE summary for a section within a project"""
     section_id: str
     section_name: str
+    chapter_number: Optional[int] = None
     sub_area_count: int
     total_hours: float
     avg_confidence_score: float
