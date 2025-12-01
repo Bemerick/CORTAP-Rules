@@ -22,7 +22,7 @@ services:
       - key: API_RELOAD
         value: False
       - key: ALLOWED_ORIGINS
-        value: https://fta-review.onrender.com,http://localhost:3000,http://localhost:5173
+        value: "*"
       - key: PYTHON_VERSION
         value: 3.11.0
 
