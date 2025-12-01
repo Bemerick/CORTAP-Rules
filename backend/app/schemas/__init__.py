@@ -2,7 +2,7 @@
 Pydantic Schemas for API request/response validation
 """
 
-from .question import QuestionSchema, QuestionOptionSchema, QuestionWithOptionsSchema
+from .question import QuestionSchema, QuestionWithOptionsSchema
 from .section import SectionSchema, SectionSummarySchema
 from .sub_area import SubAreaSchema, SubAreaDetailSchema, IndicatorSchema, DeficiencySchema
 from .project import (
@@ -18,7 +18,6 @@ from .assessment import AssessmentRequestSchema, AssessmentResultSchema
 
 __all__ = [
     'QuestionSchema',
-    'QuestionOptionSchema',
     'QuestionWithOptionsSchema',
     'SectionSchema',
     'SectionSummarySchema',
