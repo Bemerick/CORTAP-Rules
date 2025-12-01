@@ -164,8 +164,24 @@ def submit_project_answers(
                 user_answer = answer_map[rule.question_id]
                 required_answer = rule.required_answer
 
-                # Check if required answer is in user's answer (handles multi-select)
-                if required_answer in user_answer.split(',') or user_answer == required_answer:
+                # Special logic for question 1 (recipient type):
+                # If rule requires "all" (all recipients), it matches state/non_state
+                # If user selected "state" or "non_state", also match "all" rules
+                if rule.question_id == 1:  # Question 1 is recipient type
+                    if required_answer == 'all':
+                        # "all" matches any recipient type selection
+                        is_applicable = True
+                        break
+                    elif user_answer in ['state', 'non_state'] and required_answer == user_answer:
+                        # Exact match for specific recipient type
+                        is_applicable = True
+                        break
+                    elif user_answer == 'all' and required_answer in ['state', 'non_state', 'all']:
+                        # User selected "all" matches any specific type
+                        is_applicable = True
+                        break
+                # For other questions, check exact or multi-select match
+                elif required_answer in user_answer.split(',') or user_answer == required_answer:
                     is_applicable = True
                     break
 
