@@ -6,8 +6,8 @@ from .section import Section
 from .sub_area import SubArea
 from .indicator import IndicatorOfCompliance
 from .deficiency import Deficiency
-from .question import Question, QuestionOption
-from .rule import ApplicabilityRule, RuleCondition
+from .question import Question
+from .rule import ApplicabilityRule
 from .project import Project, ProjectAnswer, ProjectApplicability
 
 __all__ = [
@@ -16,9 +16,7 @@ __all__ = [
     'IndicatorOfCompliance',
     'Deficiency',
     'Question',
-    'QuestionOption',
     'ApplicabilityRule',
-    'RuleCondition',
     'Project',
     'ProjectAnswer',
     'ProjectApplicability',
