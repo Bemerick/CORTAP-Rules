@@ -29,4 +29,3 @@ class SubArea(Base):
     section = relationship("Section", back_populates="sub_areas")
     indicators = relationship("IndicatorOfCompliance", back_populates="sub_area", lazy="joined")
     deficiencies = relationship("Deficiency", back_populates="sub_area", lazy="joined")
-    rules = relationship("ApplicabilityRule", back_populates="sub_area")
