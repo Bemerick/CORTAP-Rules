@@ -87,7 +87,7 @@ CREATE TABLE IF NOT EXISTS project_answers (
     UNIQUE(project_id, question_id)
 );
 
-CREATE TABLE IF NOT EXISTS project_applicable_areas (
+CREATE TABLE IF NOT EXISTS project_applicability (
     id SERIAL PRIMARY KEY,
     project_id INTEGER NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
     sub_area_id VARCHAR(50) NOT NULL REFERENCES sub_areas(id) ON DELETE CASCADE,
