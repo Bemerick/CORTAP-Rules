@@ -16,6 +16,7 @@ export default function ApplicabilityResults() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [groupBy, setGroupBy] = useState<'section' | 'all'>('section');
+  const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     if (projectId) {
@@ -68,6 +69,22 @@ export default function ApplicabilityResults() {
     return 'confidence-low';
   };
 
+  const toggleSection = (sectionName: string) => {
+    const newExpanded = new Set(expandedSections);
+    if (newExpanded.has(sectionName)) {
+      newExpanded.delete(sectionName);
+    } else {
+      newExpanded.add(sectionName);
+    }
+    setExpandedSections(newExpanded);
+  };
+
+  const calculateSectionSummary = (subAreas: ApplicableSubArea[]) => {
+    const totalHours = subAreas.reduce((sum, sa) => sum + sa.loe_hours, 0);
+    const avgConfidence = subAreas.reduce((sum, sa) => sum + sa.loe_confidence_score, 0) / subAreas.length;
+    return { totalHours, avgConfidence };
+  };
+
   if (loading) {
     return (
       <div className="results-loading">
@@ -111,40 +128,68 @@ export default function ApplicabilityResults() {
 
       {groupBy === 'section' ? (
         <div className="results-by-section">
-          {Object.entries(groupedBySection()).map(([sectionName, { chapter, subAreas }]) => (
-            <div key={sectionName} className="section-group">
-              <h3 className="section-header">
-                {chapter ? `${chapter}. ` : ''}{sectionName}
-                <span className="section-count">({subAreas.length} areas)</span>
-              </h3>
+          {Object.entries(groupedBySection()).map(([sectionName, { chapter, subAreas }]) => {
+            const { totalHours, avgConfidence } = calculateSectionSummary(subAreas);
+            const isExpanded = expandedSections.has(sectionName);
 
-              <div className="sub-areas-list">
-                {subAreas.map((subArea) => (
-                  <div key={subArea.sub_area_id} className="sub-area-card">
-                    <div className="sub-area-header">
-                      <span className="sub-area-id">{subArea.sub_area_id}</span>
-                      <span
-                        className={`confidence-badge ${getConfidenceBadgeClass(
-                          subArea.loe_confidence_score
-                        )}`}
-                      >
-                        {subArea.loe_confidence} ({subArea.loe_confidence_score}%)
+            return (
+              <div key={sectionName} className="section-group">
+                <div
+                  className="section-summary-card"
+                  onClick={() => toggleSection(sectionName)}
+                  style={{ cursor: 'pointer' }}
+                >
+                  <div className="section-summary-header">
+                    <h3 className="section-title">
+                      <span className="expand-icon">{isExpanded ? '▼' : '▶'}</span>
+                      {chapter ? `${chapter}. ` : ''}{sectionName}
+                    </h3>
+                    <div className="section-summary-stats">
+                      <span className="section-stat">
+                        <strong>{subAreas.length}</strong> areas
                       </span>
-                    </div>
-
-                    <h4 className="sub-area-question">{subArea.question}</h4>
-                    <p className="sub-area-requirement">{subArea.basic_requirement}</p>
-
-                    <div className="sub-area-footer">
-                      <span className="loe-hours">
-                        <strong>LOE:</strong> {subArea.loe_hours} hours
+                      <span className="section-stat">
+                        <strong>{totalHours.toFixed(1)}</strong> hours
+                      </span>
+                      <span
+                        className={`confidence-badge ${getConfidenceBadgeClass(avgConfidence)}`}
+                      >
+                        {avgConfidence.toFixed(1)}%
                       </span>
                     </div>
                   </div>
-                ))}
+                </div>
+
+                {isExpanded && (
+                  <div className="sub-areas-list">
+                    {subAreas.map((subArea) => (
+                      <div key={subArea.sub_area_id} className="sub-area-card">
+                        <div className="sub-area-header">
+                          <span className="sub-area-id">{subArea.sub_area_id}</span>
+                          <span
+                            className={`confidence-badge ${getConfidenceBadgeClass(
+                              subArea.loe_confidence_score
+                            )}`}
+                          >
+                            {subArea.loe_confidence} ({subArea.loe_confidence_score}%)
+                          </span>
+                        </div>
+
+                        <h4 className="sub-area-question">{subArea.question}</h4>
+                        <p className="sub-area-requirement">{subArea.basic_requirement}</p>
+
+                        <div className="sub-area-footer">
+                          <span className="loe-hours">
+                            <strong>LOE:</strong> {subArea.loe_hours} hours
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       ) : (
         <div className="results-all">

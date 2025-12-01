@@ -359,7 +359,64 @@
 }
 
 .section-group {
-  margin-bottom: 40px;
+  margin-bottom: 20px;
+}
+
+.section-summary-card {
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 20px;
+  transition: all 0.2s;
+  margin-bottom: 10px;
+}
+
+.section-summary-card:hover {
+  border-color: #1976d2;
+  box-shadow: 0 2px 8px rgba(25, 118, 210, 0.15);
+}
+
+.section-summary-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #1976d2;
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.expand-icon {
+  color: #666;
+  font-size: 0.8rem;
+  display: inline-block;
+  width: 20px;
+}
+
+.section-summary-stats {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.section-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.section-stat strong {
+  font-size: 1.3rem;
+  color: #333;
+  display: block;
 }
 
 .section-header {
