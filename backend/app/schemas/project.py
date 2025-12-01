@@ -12,22 +12,31 @@ from .sub_area import SubAreaSchema
 class ProjectCreateSchema(BaseModel):
     name: str
     description: Optional[str] = None
+    grantee_name: Optional[str] = None
+    grant_number: Optional[str] = None
+    review_type: Optional[str] = None
 
 
 class ProjectUpdateSchema(BaseModel):
     name: Optional[str] = None
     description: Optional[str] = None
+    grantee_name: Optional[str] = None
+    grant_number: Optional[str] = None
+    review_type: Optional[str] = None
 
 
 class ProjectAnswersSchema(BaseModel):
     """Schema for submitting project answers"""
-    answers: Dict[str, str]  # question_key: answer_value
+    answers: Dict[int, str]  # question_id: answer_value
 
 
 class ProjectSchema(BaseModel):
     id: int
     name: str
     description: Optional[str] = None
+    grantee_name: Optional[str] = None
+    grant_number: Optional[str] = None
+    review_type: Optional[str] = None
     created_at: datetime
     updated_at: datetime
 

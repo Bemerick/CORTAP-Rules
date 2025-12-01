@@ -3,7 +3,7 @@ Assessment schemas
 """
 
 from pydantic import BaseModel
-from typing import Dict, List
+from typing import Dict, List, Any
 from decimal import Decimal
 from .sub_area import SubAreaSchema
 
@@ -19,4 +19,4 @@ class AssessmentResultSchema(BaseModel):
     applicable_sub_areas: List[SubAreaSchema]
     total_hours: Decimal
     avg_confidence: float
-    sections_summary: List[Dict[str, any]]  # Summary by section
+    sections_summary: List[Dict[str, Any]]  # Summary by section
