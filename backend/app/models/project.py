@@ -14,7 +14,9 @@ class Project(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(255), unique=True, nullable=False)
     description = Column(Text)
-    answers = Column(JSON)  # Legacy JSONB storage
+    grantee_name = Column(String(255))
+    grant_number = Column(String(100))
+    review_type = Column(String(50))
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
@@ -28,9 +30,9 @@ class ProjectAnswer(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     project_id = Column(Integer, ForeignKey("projects.id"), nullable=False)
-    question_key = Column(String(50), nullable=False)
-    answer_value = Column(Text, nullable=False)
-    answered_at = Column(DateTime(timezone=True), server_default=func.now())
+    question_id = Column(Integer, ForeignKey("questionnaire_questions.id"), nullable=False)
+    answer = Column(String(50), nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     # Relationships
     project = relationship("Project", back_populates="project_answers")
