@@ -123,23 +123,54 @@ def submit_project_answers(
     db.query(ProjectApplicability).filter(ProjectApplicability.project_id == project_id).delete()
 
     # Insert new answers
-    for question_key, answer_value in answers_data.answers.items():
+    for question_id, answer in answers_data.answers.items():
         project_answer = ProjectAnswer(
             project_id=project_id,
-            question_key=question_key,
-            answer_value=answer_value
+            question_id=question_id,
+            answer=answer
         )
         db.add(project_answer)
 
     db.commit()
 
-    # Calculate applicable sub-areas using database function
-    result = db.execute(
-        text("SELECT sub_area_id FROM get_applicable_sub_areas(:project_id)"),
-        {"project_id": project_id}
-    )
+    # Calculate applicable sub-areas by matching answers with applicability rules
+    # Get all project answers
+    project_answers = db.query(ProjectAnswer).filter(ProjectAnswer.project_id == project_id).all()
 
-    applicable_sub_area_ids = [row[0] for row in result]
+    # Create a map of question_id -> answer
+    answer_map = {pa.question_id: pa.answer for pa in project_answers}
+
+    # Get all applicability rules
+    from app.models import ApplicabilityRule
+
+    # Find sub-areas where ALL rules match the answers
+    # Group rules by sub_area_id
+    from collections import defaultdict
+    rules_by_sub_area = defaultdict(list)
+
+    all_rules = db.query(ApplicabilityRule).all()
+    for rule in all_rules:
+        rules_by_sub_area[rule.sub_area_id].append(rule)
+
+    # Check which sub-areas are applicable
+    applicable_sub_area_ids = []
+    for sub_area_id, rules in rules_by_sub_area.items():
+        # A sub-area is applicable if ANY of its rules match (OR logic)
+        # Each rule checks if question_id's answer matches required_answer
+        is_applicable = False
+        for rule in rules:
+            if rule.question_id in answer_map:
+                # Check if answer matches (handle multi-select with comma-separated values)
+                user_answer = answer_map[rule.question_id]
+                required_answer = rule.required_answer
+
+                # Check if required answer is in user's answer (handles multi-select)
+                if required_answer in user_answer.split(',') or user_answer == required_answer:
+                    is_applicable = True
+                    break
+
+        if is_applicable:
+            applicable_sub_area_ids.append(sub_area_id)
 
     # Insert applicability records
     for sub_area_id in applicable_sub_area_ids:
