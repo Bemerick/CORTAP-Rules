@@ -37,11 +37,14 @@ def create_project(project: ProjectCreateSchema, db: Session = Depends(get_db)):
     # Check if project name already exists
     existing = db.query(Project).filter(Project.name == project.name).first()
     if existing:
-        raise HTTPException(status_code=400, detail="Project name already exists")
+        raise HTTPException(status_code=400, detail=f"Project with name '{project.name}' already exists")
 
     new_project = Project(
         name=project.name,
-        description=project.description
+        description=project.description,
+        grantee_name=project.grantee_name,
+        grant_number=project.grant_number,
+        review_type=project.review_type
     )
 
     db.add(new_project)
