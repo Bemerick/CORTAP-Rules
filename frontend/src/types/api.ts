@@ -4,22 +4,11 @@
  */
 
 // Question types
-export interface QuestionOption {
-  id: number;
-  option_value: string;
-  option_label: string;
-  display_order: number;
-}
-
 export interface Question {
   id: number;
-  question_key: string;
+  question_number: number;
   question_text: string;
-  question_type: string;
-  help_text?: string;
-  display_order: number;
-  is_required: boolean;
-  options?: QuestionOption[];
+  category?: string;
 }
 
 // Section types

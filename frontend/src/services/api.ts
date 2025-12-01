@@ -45,8 +45,8 @@ class ApiService {
     return response.data;
   }
 
-  async getQuestion(key: string): Promise<Question> {
-    const response = await this.client.get(`/api/questions/${key}`);
+  async getQuestion(id: number): Promise<Question> {
+    const response = await this.client.get(`/api/questions/${id}`);
     return response.data;
   }
 
