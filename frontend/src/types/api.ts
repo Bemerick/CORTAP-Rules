@@ -115,6 +115,7 @@ export interface SectionLOESummary {
   section_name: string;
   chapter_number?: number;
   sub_area_count: number;
+  indicator_count: number;
   total_hours: number;
   avg_confidence_score: number;
 }
@@ -123,6 +124,7 @@ export interface ProjectLOESummary {
   project_id: number;
   project_name: string;
   total_sub_areas: number;
+  total_indicators: number;
   total_hours: number;
   avg_confidence_score: number;
   sections: SectionLOESummary[];

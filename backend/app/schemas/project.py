@@ -78,6 +78,7 @@ class SectionLOESummary(BaseModel):
     section_name: str
     chapter_number: Optional[int] = None
     sub_area_count: int
+    indicator_count: int = 0
     total_hours: float
     avg_confidence_score: float
 
@@ -87,6 +88,7 @@ class ProjectLOESummarySchema(BaseModel):
     project_id: int
     project_name: str
     total_sub_areas: int
+    total_indicators: int = 0
     total_hours: float
     avg_confidence_score: float
     sections: List[SectionLOESummary]

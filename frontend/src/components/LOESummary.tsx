@@ -79,6 +79,7 @@ export default function LOESummary() {
           <div className="total-value">{summary.total_hours.toFixed(2)} hours</div>
           <div className="total-meta">
             <span>{summary.total_sub_areas} Questions Examined</span>
+            <span>{summary.total_indicators} Indicators of Compliance</span>
             <span
               className={`confidence-badge ${getConfidenceBadgeClass(
                 summary.avg_confidence_score
@@ -99,6 +100,7 @@ export default function LOESummary() {
               <tr>
                 <th>Section</th>
                 <th>Questions Examined</th>
+                <th>Indicators of Compliance</th>
                 <th>Total Hours</th>
                 <th>Avg Confidence</th>
               </tr>
@@ -112,6 +114,7 @@ export default function LOESummary() {
                       {section.chapter_number ? `${section.chapter_number}. ` : ''}{section.section_name}
                     </td>
                     <td className="section-count">{section.sub_area_count}</td>
+                    <td className="section-count">{section.indicator_count}</td>
                     <td className="section-hours">
                       <strong>{section.total_hours.toFixed(2)}</strong> hours
                     </td>
@@ -131,6 +134,7 @@ export default function LOESummary() {
               <tr className="totals-row">
                 <td><strong>Total</strong></td>
                 <td><strong>{summary.total_sub_areas}</strong></td>
+                <td><strong>{summary.total_indicators}</strong></td>
                 <td><strong>{summary.total_hours.toFixed(2)} hours</strong></td>
                 <td>
                   <span

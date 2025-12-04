@@ -329,12 +329,39 @@ def get_project_loe_summary(project_id: int, db: Session = Depends(get_db)):
     .order_by(Section.chapter_number.asc().nullslast())\
     .all()
 
+    # Get all applicable sub-areas for this project to count indicators
+    applicable_sub_areas = db.query(SubArea.id, SubArea.section_id).join(
+        ProjectApplicability,
+        SubArea.id == ProjectApplicability.sub_area_id
+    ).filter(
+        ProjectApplicability.project_id == project_id,
+        ProjectApplicability.is_applicable == True
+    ).all()
+
+    sub_area_ids = [sa.id for sa in applicable_sub_areas]
+
+    # Count indicators per section
+    indicator_counts_by_section = {}
+    if sub_area_ids:
+        indicator_counts = db.query(
+            SubArea.section_id,
+            func.count(IndicatorOfCompliance.id).label('indicator_count')
+        ).join(
+            IndicatorOfCompliance,
+            SubArea.id == IndicatorOfCompliance.sub_area_id
+        ).filter(
+            SubArea.id.in_(sub_area_ids)
+        ).group_by(SubArea.section_id).all()
+
+        indicator_counts_by_section = {ic.section_id: ic.indicator_count for ic in indicator_counts}
+
     sections = [
         SectionLOESummary(
             section_id=s.id,
             section_name=s.title,
             chapter_number=s.chapter_number,
             sub_area_count=s.applicable_sub_areas,
+            indicator_count=indicator_counts_by_section.get(s.id, 0),
             total_hours=float(s.section_hours) if s.section_hours else 0.0,
             avg_confidence_score=float(s.avg_confidence) if s.avg_confidence else 0.0
         )
@@ -343,6 +370,7 @@ def get_project_loe_summary(project_id: int, db: Session = Depends(get_db)):
 
     # Calculate totals
     total_sub_areas = sum(s.sub_area_count for s in sections)
+    total_indicators = sum(s.indicator_count for s in sections)
     total_hours = sum(s.total_hours for s in sections)
     avg_confidence = sum(s.avg_confidence_score * s.sub_area_count for s in sections) / total_sub_areas if total_sub_areas > 0 else 0.0
 
@@ -350,6 +378,7 @@ def get_project_loe_summary(project_id: int, db: Session = Depends(get_db)):
         project_id=project.id,
         project_name=project.name,
         total_sub_areas=total_sub_areas,
+        total_indicators=total_indicators,
         total_hours=total_hours,
         avg_confidence_score=avg_confidence,
         sections=sections
