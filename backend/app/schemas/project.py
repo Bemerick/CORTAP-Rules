@@ -44,6 +44,13 @@ class ProjectSchema(BaseModel):
         from_attributes = True
 
 
+class IndicatorOfComplianceSchema(BaseModel):
+    """Indicator of Compliance"""
+    id: int
+    indicator_id: str
+    text: str
+
+
 class ApplicableSubAreaSchema(BaseModel):
     """Simplified sub-area for applicability results"""
     section_id: str
@@ -55,6 +62,7 @@ class ApplicableSubAreaSchema(BaseModel):
     loe_hours: float
     loe_confidence: str
     loe_confidence_score: int
+    indicators: List[IndicatorOfComplianceSchema] = []
 
 
 class ProjectApplicabilityResultSchema(BaseModel):
