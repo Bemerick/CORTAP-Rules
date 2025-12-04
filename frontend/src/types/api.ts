@@ -85,6 +85,12 @@ export interface ProjectAnswers {
   answers: Record<string, string>;
 }
 
+export interface IndicatorOfCompliance {
+  id: number;
+  indicator_id: string;
+  text: string;
+}
+
 export interface ApplicableSubArea {
   section_id: string;
   section_name: string;
@@ -95,6 +101,7 @@ export interface ApplicableSubArea {
   loe_hours: number;
   loe_confidence: string;
   loe_confidence_score: number;
+  indicators: IndicatorOfCompliance[];
 }
 
 export interface ProjectApplicabilityResult {

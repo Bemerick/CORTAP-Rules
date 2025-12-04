@@ -17,6 +17,7 @@ export default function ApplicabilityResults() {
   const [error, setError] = useState<string | null>(null);
   const [groupBy, setGroupBy] = useState<'section' | 'all'>('section');
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set());
+  const [expandedAreas, setExpandedAreas] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     if (projectId) {
@@ -79,10 +80,26 @@ export default function ApplicabilityResults() {
     setExpandedSections(newExpanded);
   };
 
+  const toggleArea = (subAreaId: string) => {
+    const newExpanded = new Set(expandedAreas);
+    if (newExpanded.has(subAreaId)) {
+      newExpanded.delete(subAreaId);
+    } else {
+      newExpanded.add(subAreaId);
+    }
+    setExpandedAreas(newExpanded);
+  };
+
   const calculateSectionSummary = (subAreas: ApplicableSubArea[]) => {
     const totalHours = subAreas.reduce((sum, sa) => sum + sa.loe_hours, 0);
     const avgConfidence = subAreas.reduce((sum, sa) => sum + sa.loe_confidence_score, 0) / subAreas.length;
-    return { totalHours, avgConfidence };
+    const totalIndicators = subAreas.reduce((sum, sa) => sum + (sa.indicators?.length || 0), 0);
+    return { totalHours, avgConfidence, totalIndicators };
+  };
+
+  const getTotalIndicatorCount = (): number => {
+    if (!results || !results.applicable_sub_areas) return 0;
+    return results.applicable_sub_areas.reduce((sum, sa) => sum + (sa.indicators?.length || 0), 0);
   };
 
   if (loading) {
@@ -110,7 +127,7 @@ export default function ApplicabilityResults() {
         <div>
           <h2>Assessment Results</h2>
           <p className="results-summary">
-            <strong>{results.applicable_count}</strong> applicable review areas found
+            <strong>{results.applicable_count}</strong> Questions Examined • <strong>{getTotalIndicatorCount()}</strong> Indicators of Compliance
           </p>
         </div>
         <div className="results-actions">
@@ -129,7 +146,7 @@ export default function ApplicabilityResults() {
       {groupBy === 'section' ? (
         <div className="results-by-section">
           {Object.entries(groupedBySection()).map(([sectionName, { chapter, subAreas }]) => {
-            const { totalHours, avgConfidence } = calculateSectionSummary(subAreas);
+            const { totalHours, avgConfidence, totalIndicators } = calculateSectionSummary(subAreas);
             const isExpanded = expandedSections.has(sectionName);
 
             return (
@@ -146,7 +163,10 @@ export default function ApplicabilityResults() {
                     </h3>
                     <div className="section-summary-stats">
                       <span className="section-stat">
-                        <strong>{subAreas.length}</strong> areas
+                        <strong>{subAreas.length}</strong> questions
+                      </span>
+                      <span className="section-stat">
+                        <strong>{totalIndicators}</strong> indicators
                       </span>
                       <span className="section-stat">
                         <strong>{totalHours.toFixed(1)}</strong> hours
@@ -162,29 +182,57 @@ export default function ApplicabilityResults() {
 
                 {isExpanded && (
                   <div className="sub-areas-list">
-                    {subAreas.map((subArea) => (
-                      <div key={subArea.sub_area_id} className="sub-area-card">
-                        <div className="sub-area-header">
-                          <span className="sub-area-id">{subArea.sub_area_id}</span>
-                          <span
-                            className={`confidence-badge ${getConfidenceBadgeClass(
-                              subArea.loe_confidence_score
-                            )}`}
+                    {subAreas.map((subArea) => {
+                      const isAreaExpanded = expandedAreas.has(subArea.sub_area_id);
+                      return (
+                        <div key={subArea.sub_area_id} className="sub-area-card">
+                          <div
+                            className="sub-area-header"
+                            onClick={() => toggleArea(subArea.sub_area_id)}
+                            style={{ cursor: 'pointer' }}
                           >
-                            {subArea.loe_confidence} ({subArea.loe_confidence_score}%)
-                          </span>
-                        </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                              <span className="expand-icon">{isAreaExpanded ? '▼' : '▶'}</span>
+                              <span className="sub-area-id">{subArea.sub_area_id}</span>
+                            </div>
+                            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                              <span className="indicator-count">
+                                {subArea.indicators?.length || 0} indicators
+                              </span>
+                              <span
+                                className={`confidence-badge ${getConfidenceBadgeClass(
+                                  subArea.loe_confidence_score
+                                )}`}
+                              >
+                                {subArea.loe_confidence} ({subArea.loe_confidence_score}%)
+                              </span>
+                            </div>
+                          </div>
 
-                        <h4 className="sub-area-question">{subArea.question}</h4>
-                        <p className="sub-area-requirement">{subArea.basic_requirement}</p>
+                          <h4 className="sub-area-question">{subArea.question}</h4>
+                          <p className="sub-area-requirement">{subArea.basic_requirement}</p>
 
-                        <div className="sub-area-footer">
-                          <span className="loe-hours">
-                            <strong>LOE:</strong> {subArea.loe_hours} hours
-                          </span>
+                          {isAreaExpanded && subArea.indicators && subArea.indicators.length > 0 && (
+                            <div className="indicators-list">
+                              <h5 className="indicators-title">Indicators of Compliance:</h5>
+                              <ul className="indicators-ul">
+                                {subArea.indicators.map((indicator) => (
+                                  <li key={indicator.id} className="indicator-item">
+                                    <strong>{indicator.indicator_id}:</strong> {indicator.text}
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+
+                          <div className="sub-area-footer">
+                            <span className="loe-hours">
+                              <strong>LOE:</strong> {subArea.loe_hours} hours
+                            </span>
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 )}
               </div>
@@ -194,35 +242,63 @@ export default function ApplicabilityResults() {
       ) : (
         <div className="results-all">
           <div className="sub-areas-list">
-            {results?.applicable_sub_areas?.map((subArea) => (
-              <div key={subArea.sub_area_id} className="sub-area-card">
-                <div className="sub-area-header">
-                  <span className="sub-area-id">
-                    {subArea.section_id} - {subArea.sub_area_id}
-                  </span>
-                  <span
-                    className={`confidence-badge ${getConfidenceBadgeClass(
-                      subArea.loe_confidence_score
-                    )}`}
+            {results?.applicable_sub_areas?.map((subArea) => {
+              const isAreaExpanded = expandedAreas.has(subArea.sub_area_id);
+              return (
+                <div key={subArea.sub_area_id} className="sub-area-card">
+                  <div
+                    className="sub-area-header"
+                    onClick={() => toggleArea(subArea.sub_area_id)}
+                    style={{ cursor: 'pointer' }}
                   >
-                    {subArea.loe_confidence} ({subArea.loe_confidence_score}%)
-                  </span>
-                </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span className="expand-icon">{isAreaExpanded ? '▼' : '▶'}</span>
+                      <span className="sub-area-id">
+                        {subArea.section_id} - {subArea.sub_area_id}
+                      </span>
+                    </div>
+                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                      <span className="indicator-count">
+                        {subArea.indicators?.length || 0} indicators
+                      </span>
+                      <span
+                        className={`confidence-badge ${getConfidenceBadgeClass(
+                          subArea.loe_confidence_score
+                        )}`}
+                      >
+                        {subArea.loe_confidence} ({subArea.loe_confidence_score}%)
+                      </span>
+                    </div>
+                  </div>
 
-                <div className="section-tag">
-                  {subArea.chapter_number ? `${subArea.chapter_number}. ` : ''}{subArea.section_name}
-                </div>
+                  <div className="section-tag">
+                    {subArea.chapter_number ? `${subArea.chapter_number}. ` : ''}{subArea.section_name}
+                  </div>
 
-                <h4 className="sub-area-question">{subArea.question}</h4>
-                <p className="sub-area-requirement">{subArea.basic_requirement}</p>
+                  <h4 className="sub-area-question">{subArea.question}</h4>
+                  <p className="sub-area-requirement">{subArea.basic_requirement}</p>
 
-                <div className="sub-area-footer">
-                  <span className="loe-hours">
-                    <strong>LOE:</strong> {subArea.loe_hours} hours
-                  </span>
+                  {isAreaExpanded && subArea.indicators && subArea.indicators.length > 0 && (
+                    <div className="indicators-list">
+                      <h5 className="indicators-title">Indicators of Compliance:</h5>
+                      <ul className="indicators-ul">
+                        {subArea.indicators.map((indicator) => (
+                          <li key={indicator.id} className="indicator-item">
+                            <strong>{indicator.indicator_id}:</strong> {indicator.text}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  <div className="sub-area-footer">
+                    <span className="loe-hours">
+                      <strong>LOE:</strong> {subArea.loe_hours} hours
+                    </span>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}

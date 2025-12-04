@@ -9,7 +9,7 @@ from typing import List
 from decimal import Decimal
 
 from app.database.connection import get_db
-from app.models import Project, ProjectAnswer, SubArea, Section, ProjectApplicability
+from app.models import Project, ProjectAnswer, SubArea, Section, ProjectApplicability, IndicatorOfCompliance
 from app.schemas import (
     ProjectSchema,
     ProjectCreateSchema,
@@ -202,6 +202,22 @@ def submit_project_answers(
     # Get detailed sub-area information
     sub_areas = db.query(SubArea).filter(SubArea.id.in_(applicable_sub_area_ids)).all()
 
+    # Get all indicators for applicable sub-areas
+    indicators = db.query(IndicatorOfCompliance).filter(
+        IndicatorOfCompliance.sub_area_id.in_(applicable_sub_area_ids)
+    ).all()
+
+    # Group indicators by sub_area_id
+    indicators_by_sub_area = {}
+    for indicator in indicators:
+        if indicator.sub_area_id not in indicators_by_sub_area:
+            indicators_by_sub_area[indicator.sub_area_id] = []
+        indicators_by_sub_area[indicator.sub_area_id].append({
+            'id': indicator.id,
+            'indicator_id': indicator.indicator_id,
+            'text': indicator.text
+        })
+
     # Format as ApplicableSubArea objects and sort by chapter number
     applicable_sub_areas = []
     for sa in sub_areas:
@@ -214,7 +230,8 @@ def submit_project_answers(
             'basic_requirement': sa.basic_requirement or '',
             'loe_hours': float(sa.loe_hours) if sa.loe_hours else 0.0,
             'loe_confidence': sa.loe_confidence or 'medium',
-            'loe_confidence_score': sa.loe_confidence_score or 0
+            'loe_confidence_score': sa.loe_confidence_score or 0,
+            'indicators': indicators_by_sub_area.get(sa.id, [])
         })
 
     # Sort by chapter number
@@ -244,6 +261,23 @@ def get_project_applicable_sub_areas(project_id: int, db: Session = Depends(get_
         ProjectApplicability.is_applicable == True
     ).order_by(SubArea.section_id, SubArea.id).all()
 
+    # Get all indicators for applicable sub-areas
+    sub_area_ids = [sa.id for sa in sub_areas]
+    indicators = db.query(IndicatorOfCompliance).filter(
+        IndicatorOfCompliance.sub_area_id.in_(sub_area_ids)
+    ).all()
+
+    # Group indicators by sub_area_id
+    indicators_by_sub_area = {}
+    for indicator in indicators:
+        if indicator.sub_area_id not in indicators_by_sub_area:
+            indicators_by_sub_area[indicator.sub_area_id] = []
+        indicators_by_sub_area[indicator.sub_area_id].append({
+            'id': indicator.id,
+            'indicator_id': indicator.indicator_id,
+            'text': indicator.text
+        })
+
     # Format as ApplicableSubArea objects and sort by chapter number
     applicable_sub_areas = []
     for sa in sub_areas:
@@ -256,7 +290,8 @@ def get_project_applicable_sub_areas(project_id: int, db: Session = Depends(get_
             'basic_requirement': sa.basic_requirement or '',
             'loe_hours': float(sa.loe_hours) if sa.loe_hours else 0.0,
             'loe_confidence': sa.loe_confidence or 'medium',
-            'loe_confidence_score': sa.loe_confidence_score or 0
+            'loe_confidence_score': sa.loe_confidence_score or 0,
+            'indicators': indicators_by_sub_area.get(sa.id, [])
         })
 
     # Sort by chapter number

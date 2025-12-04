@@ -78,7 +78,7 @@ export default function LOESummary() {
           <h3>Grand Total</h3>
           <div className="total-value">{summary.total_hours.toFixed(2)} hours</div>
           <div className="total-meta">
-            <span>{summary.total_sub_areas} review areas</span>
+            <span>{summary.total_sub_areas} Questions Examined</span>
             <span
               className={`confidence-badge ${getConfidenceBadgeClass(
                 summary.avg_confidence_score
@@ -98,7 +98,7 @@ export default function LOESummary() {
             <thead>
               <tr>
                 <th>Section</th>
-                <th>Sub-Areas</th>
+                <th>Questions Examined</th>
                 <th>Total Hours</th>
                 <th>Avg Confidence</th>
               </tr>
