@@ -105,7 +105,13 @@ export default function ApplicabilityResults() {
   if (loading) {
     return (
       <div className="results-loading">
-        <p>Loading results...</p>
+        <div className="loading-container">
+          <h3>Loading Assessment Results</h3>
+          <div className="progress-bar">
+            <div className="progress-bar-fill"></div>
+          </div>
+          <p>Analyzing your project and determining applicable review areas...</p>
+        </div>
       </div>
     );
   }

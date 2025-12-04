@@ -45,7 +45,13 @@ export default function LOESummary() {
   if (loading) {
     return (
       <div className="loe-loading">
-        <p>Loading LOE summary...</p>
+        <div className="loading-container">
+          <h3>Loading LOE Summary</h3>
+          <div className="progress-bar">
+            <div className="progress-bar-fill"></div>
+          </div>
+          <p>Calculating level of effort estimates...</p>
+        </div>
       </div>
     );
   }
