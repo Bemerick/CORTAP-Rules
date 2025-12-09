@@ -10,7 +10,7 @@ from openpyxl.utils import get_column_letter
 from sqlalchemy.orm import Session
 from typing import List, Dict, Any
 
-from app.models import SubArea, Section, IndicatorOfCompliance, ProjectApplicability
+from app.models import SubArea, Section, IndicatorOfCompliance, ProjectApplicability, Deficiency
 
 
 def get_project_workbook_data(db: Session, project_id: int) -> Dict[str, Any]:
@@ -53,6 +53,23 @@ def get_project_workbook_data(db: Session, project_id: int) -> Dict[str, Any]:
             'text': indicator.text
         })
 
+    # Get all deficiencies for these sub-areas
+    deficiencies = db.query(Deficiency).filter(
+        Deficiency.sub_area_id.in_(sub_area_ids)
+    ).all()
+
+    # Group deficiencies by sub_area_id
+    deficiencies_by_sub_area = {}
+    for deficiency in deficiencies:
+        if deficiency.sub_area_id not in deficiencies_by_sub_area:
+            deficiencies_by_sub_area[deficiency.sub_area_id] = []
+        deficiencies_by_sub_area[deficiency.sub_area_id].append({
+            'code': deficiency.code,
+            'title': deficiency.title,
+            'determination': deficiency.determination,
+            'suggested_corrective_action': deficiency.suggested_corrective_action
+        })
+
     # Group sub-areas by section
     sub_areas_by_section = {}
     for sa in sub_areas:
@@ -61,7 +78,8 @@ def get_project_workbook_data(db: Session, project_id: int) -> Dict[str, Any]:
         sub_areas_by_section[sa.section_id].append({
             'id': sa.id,
             'question': sa.question,
-            'indicators_of_compliance': indicators_by_sub_area.get(sa.id, [])
+            'indicators_of_compliance': indicators_by_sub_area.get(sa.id, []),
+            'deficiencies': deficiencies_by_sub_area.get(sa.id, [])
         })
 
     # Build the sections structure
@@ -171,9 +189,47 @@ def create_workbook_bytes(data: Dict[str, Any]) -> BytesIO:
             sub_area_id = sub_area.get('id', '')
             question = sub_area.get('question', '')
             indicators = sub_area.get('indicators_of_compliance', [])
+            deficiencies = sub_area.get('deficiencies', [])
 
             # Prepend sub_area id to question
             question_with_id = f"{sub_area_id}. {question}" if sub_area_id else question
+
+            # Prepare deficiency data for merged cells
+            deficiency_codes = []
+            determinations = []
+            corrective_actions = []
+
+            for idx, deficiency in enumerate(deficiencies, 1):
+                code = deficiency.get('code', '')
+                title = deficiency.get('title', '')
+                if code and title:
+                    deficiency_codes.append(f"{code} - {title}")
+                elif code:
+                    deficiency_codes.append(code)
+
+                determination = deficiency.get('determination', '')
+                if determination:
+                    determinations.append(determination)
+
+                action = deficiency.get('suggested_corrective_action', '')
+                if action:
+                    corrective_actions.append(action)
+
+            # Join multiple deficiencies with newlines and numbering
+            if len(deficiency_codes) > 1:
+                deficiency_code_text = '\n\n'.join([f"{i}. {code}" for i, code in enumerate(deficiency_codes, 1)])
+            else:
+                deficiency_code_text = deficiency_codes[0] if deficiency_codes else ''
+
+            if len(determinations) > 1:
+                determination_text = '\n\n'.join([f"{i}. {det}" for i, det in enumerate(determinations, 1)])
+            else:
+                determination_text = determinations[0] if determinations else ''
+
+            if len(corrective_actions) > 1:
+                corrective_action_text = '\n\n'.join([f"{i}. {action}" for i, action in enumerate(corrective_actions, 1)])
+            else:
+                corrective_action_text = corrective_actions[0] if corrective_actions else ''
 
             # Get number of indicators for merging
             num_indicators = len(indicators) if indicators else 0
@@ -188,14 +244,77 @@ def create_workbook_bytes(data: Dict[str, Any]) -> BytesIO:
                 cell = ws.cell(row=start_row, column=1, value=question_with_id)
                 cell.alignment = cell_alignment
                 cell.border = border
+
+                # Merge columns 3-10 at question level (Compliant, Non-Compliant, N/A, Audit Evidence,
+                # Finding of Non-Compliance Code, Audit Finding Description, Additional Info, Required Action)
+                # Column 3: Compliant
+                ws.merge_cells(start_row=start_row, start_column=3, end_row=end_row, end_column=3)
+                cell = ws.cell(row=start_row, column=3, value='')
+                cell.alignment = cell_alignment
+                cell.border = border
+
+                # Column 4: Non-Compliant
+                ws.merge_cells(start_row=start_row, start_column=4, end_row=end_row, end_column=4)
+                cell = ws.cell(row=start_row, column=4, value='')
+                cell.alignment = cell_alignment
+                cell.border = border
+
+                # Column 5: N/A
+                ws.merge_cells(start_row=start_row, start_column=5, end_row=end_row, end_column=5)
+                cell = ws.cell(row=start_row, column=5, value='')
+                cell.alignment = cell_alignment
+                cell.border = border
+
+                # Column 6: Audit Evidence
+                ws.merge_cells(start_row=start_row, start_column=6, end_row=end_row, end_column=6)
+                cell = ws.cell(row=start_row, column=6, value='')
+                cell.alignment = cell_alignment
+                cell.border = border
+
+                # Column 7: Finding of Non-Compliance Code
+                ws.merge_cells(start_row=start_row, start_column=7, end_row=end_row, end_column=7)
+                cell = ws.cell(row=start_row, column=7, value=deficiency_code_text)
+                cell.alignment = cell_alignment
+                cell.border = border
+
+                # Column 8: Audit Finding Description
+                ws.merge_cells(start_row=start_row, start_column=8, end_row=end_row, end_column=8)
+                cell = ws.cell(row=start_row, column=8, value=determination_text)
+                cell.alignment = cell_alignment
+                cell.border = border
+
+                # Column 9: Additional Info
+                ws.merge_cells(start_row=start_row, start_column=9, end_row=end_row, end_column=9)
+                cell = ws.cell(row=start_row, column=9, value='')
+                cell.alignment = cell_alignment
+                cell.border = border
+
+                # Column 10: Required Action
+                ws.merge_cells(start_row=start_row, start_column=10, end_row=end_row, end_column=10)
+                cell = ws.cell(row=start_row, column=10, value=corrective_action_text)
+                cell.alignment = cell_alignment
+                cell.border = border
             else:
                 # No indicators, just write question normally
                 cell = ws.cell(row=current_row, column=1, value=question_with_id)
                 cell.alignment = cell_alignment
                 cell.border = border
 
+                # Add deficiency data to single row
+                cell = ws.cell(row=current_row, column=7, value=deficiency_code_text)
+                cell.alignment = cell_alignment
+                cell.border = border
+
+                cell = ws.cell(row=current_row, column=8, value=determination_text)
+                cell.alignment = cell_alignment
+                cell.border = border
+
+                cell = ws.cell(row=current_row, column=10, value=corrective_action_text)
+                cell.alignment = cell_alignment
+                cell.border = border
+
                 # Add borders to empty cells in question row
-                for col_idx in range(2, len(headers) + 1):
+                for col_idx in [2, 3, 4, 5, 6, 9]:
                     cell = ws.cell(row=current_row, column=col_idx, value='')
                     cell.border = border
 
@@ -215,11 +334,7 @@ def create_workbook_bytes(data: Dict[str, Any]) -> BytesIO:
                     cell.alignment = cell_alignment
                     cell.border = border
 
-                    # Empty cells for remaining columns
-                    for col_idx in range(3, len(headers) + 1):
-                        cell = ws.cell(row=current_row, column=col_idx, value='')
-                        cell.border = border
-
+                    # No need to add borders to merged cells (columns 3-10 are all merged at question level)
                     current_row += 1
 
         # Freeze top row
