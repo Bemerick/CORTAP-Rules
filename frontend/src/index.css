@@ -4,13 +4,17 @@
   font-weight: 400;
 
   /* Default to light mode to ensure text visibility */
-  color: #213547;
-  background-color: #ffffff;
+  color: #213547 !important;
+  background-color: #ffffff !important;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  /* Prevent color scheme from affecting text */
+  -webkit-text-fill-color: initial;
+  -webkit-background-clip: initial;
 }
 
 a {
