@@ -3,10 +3,13 @@ Projects API endpoints
 """
 
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 from sqlalchemy import func, text
 from typing import List
 from decimal import Decimal
+from datetime import datetime
+import urllib.parse
 
 from app.database.connection import get_db
 from app.models import Project, ProjectAnswer, SubArea, Section, ProjectApplicability, IndicatorOfCompliance
@@ -20,6 +23,7 @@ from app.schemas import (
     SectionLOESummary,
     SubAreaSchema
 )
+from app.services.workbook_generator import generate_project_workbook
 
 router = APIRouter(prefix="/api/projects", tags=["projects"])
 
@@ -382,4 +386,33 @@ def get_project_loe_summary(project_id: int, db: Session = Depends(get_db)):
         total_hours=total_hours,
         avg_confidence_score=avg_confidence,
         sections=sections
+    )
+
+
+@router.get("/{project_id}/export-workbook")
+def export_project_workbook(project_id: int, db: Session = Depends(get_db)):
+    """Export project assessment results as Excel workbook"""
+    project = db.query(Project).filter(Project.id == project_id).first()
+
+    if not project:
+        raise HTTPException(status_code=404, detail="Project not found")
+
+    # Generate workbook
+    workbook_bytes = generate_project_workbook(db, project_id)
+
+    # Create filename: ProjectName-Scoping Workbook-YYYYMMDD-HHMMSS.xlsx
+    timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+    # Sanitize project name for filename
+    safe_project_name = "".join(c for c in project.name if c.isalnum() or c in (' ', '-', '_')).strip()
+    filename = f"{safe_project_name}-Scoping Workbook-{timestamp}.xlsx"
+
+    # URL encode the filename for the Content-Disposition header
+    encoded_filename = urllib.parse.quote(filename)
+
+    return StreamingResponse(
+        workbook_bytes,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={
+            "Content-Disposition": f"attachment; filename*=UTF-8''{encoded_filename}"
+        }
     )

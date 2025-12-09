@@ -18,6 +18,7 @@ export default function ApplicabilityResults() {
   const [groupBy, setGroupBy] = useState<'section' | 'all'>('section');
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set());
   const [expandedAreas, setExpandedAreas] = useState<Set<string>>(new Set());
+  const [exporting, setExporting] = useState(false);
 
   useEffect(() => {
     if (projectId) {
@@ -102,6 +103,18 @@ export default function ApplicabilityResults() {
     return results.applicable_sub_areas.reduce((sum, sa) => sum + (sa.indicators?.length || 0), 0);
   };
 
+  const handleExportWorkbook = async () => {
+    try {
+      setExporting(true);
+      await apiService.exportProjectWorkbook(projectId);
+    } catch (err) {
+      console.error('Failed to export workbook:', err);
+      alert('Failed to generate workbook. Please try again.');
+    } finally {
+      setExporting(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="results-loading">
@@ -142,6 +155,13 @@ export default function ApplicabilityResults() {
             className="btn-secondary"
           >
             {groupBy === 'section' ? 'Show All' : 'Group by Section'}
+          </button>
+          <button
+            onClick={handleExportWorkbook}
+            disabled={exporting}
+            className="btn-secondary"
+          >
+            {exporting ? 'Generating...' : 'Generate Scoping Workbook'}
           </button>
           <Link to={`/projects/${projectId}/loe`} className="btn-primary">
             View LOE Summary

@@ -121,6 +121,36 @@ class ApiService {
     return response.data;
   }
 
+  async exportProjectWorkbook(id: number): Promise<void> {
+    const response = await this.client.get(`/api/projects/${id}/export-workbook`, {
+      responseType: 'blob',
+    });
+
+    // Extract filename from Content-Disposition header
+    const contentDisposition = response.headers['content-disposition'];
+    let filename = `Project-${id}-Scoping-Workbook.xlsx`;
+
+    if (contentDisposition) {
+      const filenameMatch = contentDisposition.match(/filename\*=UTF-8''(.+)/);
+      if (filenameMatch) {
+        filename = decodeURIComponent(filenameMatch[1]);
+      }
+    }
+
+    // Create blob and trigger download
+    const blob = new Blob([response.data], {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+  }
+
   // Assessment API
   async assess(data: AssessmentRequest): Promise<AssessmentResult> {
     const response = await this.client.post('/api/assess', data);
