@@ -247,53 +247,30 @@ def create_workbook_bytes(data: Dict[str, Any]) -> BytesIO:
 
                 # Merge columns 3-10 at question level (Compliant, Non-Compliant, N/A, Audit Evidence,
                 # Finding of Non-Compliance Code, Audit Finding Description, Additional Info, Required Action)
-                # Column 3: Compliant
-                ws.merge_cells(start_row=start_row, start_column=3, end_row=end_row, end_column=3)
-                cell = ws.cell(row=start_row, column=3, value='')
-                cell.alignment = cell_alignment
-                cell.border = border
+                # We need to apply borders to all cells in merged ranges for proper display
+                merged_columns_data = [
+                    (3, ''),  # Compliant
+                    (4, ''),  # Non-Compliant
+                    (5, ''),  # N/A
+                    (6, ''),  # Audit Evidence
+                    (7, deficiency_code_text),  # Finding of Non-Compliance Code
+                    (8, determination_text),  # Audit Finding Description
+                    (9, ''),  # Additional Info
+                    (10, corrective_action_text)  # Required Action
+                ]
 
-                # Column 4: Non-Compliant
-                ws.merge_cells(start_row=start_row, start_column=4, end_row=end_row, end_column=4)
-                cell = ws.cell(row=start_row, column=4, value='')
-                cell.alignment = cell_alignment
-                cell.border = border
+                for col_num, col_value in merged_columns_data:
+                    ws.merge_cells(start_row=start_row, start_column=col_num, end_row=end_row, end_column=col_num)
 
-                # Column 5: N/A
-                ws.merge_cells(start_row=start_row, start_column=5, end_row=end_row, end_column=5)
-                cell = ws.cell(row=start_row, column=5, value='')
-                cell.alignment = cell_alignment
-                cell.border = border
+                    # Set value and formatting on primary cell
+                    cell = ws.cell(row=start_row, column=col_num, value=col_value)
+                    cell.alignment = cell_alignment
+                    cell.border = border
 
-                # Column 6: Audit Evidence
-                ws.merge_cells(start_row=start_row, start_column=6, end_row=end_row, end_column=6)
-                cell = ws.cell(row=start_row, column=6, value='')
-                cell.alignment = cell_alignment
-                cell.border = border
-
-                # Column 7: Finding of Non-Compliance Code
-                ws.merge_cells(start_row=start_row, start_column=7, end_row=end_row, end_column=7)
-                cell = ws.cell(row=start_row, column=7, value=deficiency_code_text)
-                cell.alignment = cell_alignment
-                cell.border = border
-
-                # Column 8: Audit Finding Description
-                ws.merge_cells(start_row=start_row, start_column=8, end_row=end_row, end_column=8)
-                cell = ws.cell(row=start_row, column=8, value=determination_text)
-                cell.alignment = cell_alignment
-                cell.border = border
-
-                # Column 9: Additional Info
-                ws.merge_cells(start_row=start_row, start_column=9, end_row=end_row, end_column=9)
-                cell = ws.cell(row=start_row, column=9, value='')
-                cell.alignment = cell_alignment
-                cell.border = border
-
-                # Column 10: Required Action
-                ws.merge_cells(start_row=start_row, start_column=10, end_row=end_row, end_column=10)
-                cell = ws.cell(row=start_row, column=10, value=corrective_action_text)
-                cell.alignment = cell_alignment
-                cell.border = border
+                    # Apply borders to all cells in the merged range
+                    for row_num in range(start_row, end_row + 1):
+                        cell = ws.cell(row=row_num, column=col_num)
+                        cell.border = border
             else:
                 # No indicators, just write question normally
                 cell = ws.cell(row=current_row, column=1, value=question_with_id)
@@ -322,7 +299,7 @@ def create_workbook_bytes(data: Dict[str, Any]) -> BytesIO:
 
             # Write indicators (skip if None)
             if indicators:
-                for indicator in indicators:
+                for indicator_idx, indicator in enumerate(indicators):
                     indicator_id = indicator.get('indicator_id', '')
                     indicator_text = indicator.get('text', '')
 
@@ -334,7 +311,12 @@ def create_workbook_bytes(data: Dict[str, Any]) -> BytesIO:
                     cell.alignment = cell_alignment
                     cell.border = border
 
-                    # No need to add borders to merged cells (columns 3-10 are all merged at question level)
+                    # Add borders to merged cells in this row to ensure proper border display
+                    # The merged cells already have their primary cell set with borders,
+                    # but we need to ensure the border appears on the indicator row
+                    # Note: We can't set values on merged cells, but borders should be visible
+                    # from the merge operation above
+
                     current_row += 1
 
         # Freeze top row
