@@ -1,73 +1,177 @@
-# React + TypeScript + Vite
+# FTA Comprehensive Review - Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React + TypeScript frontend application for FTA Comprehensive Review Applicability Assessment and Level of Effort (LOE) Estimation.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Interactive Questionnaire**: Dynamic assessment questions with conditional logic
+- **Project Management**: Create and manage multiple review projects
+- **Real-time Assessment**: Instant calculation of applicable review areas
+- **LOE Summary**: Visual breakdown of estimated hours by section
+- **Excel Export**: Generate audit-ready workbooks from assessment results
+- **Responsive Design**: Works on desktop and tablet devices
 
-## React Compiler
+## Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **React 18**: UI framework
+- **TypeScript**: Type-safe development
+- **Vite**: Fast build tool and dev server
+- **React Router**: Client-side routing
+- **Axios**: HTTP client for API calls
+- **CSS Modules**: Scoped styling
 
-## Expanding the ESLint configuration
+## Installation
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### 1. Install Dependencies
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+cd frontend
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### 2. Configure Environment
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+The frontend expects the backend API to be running at `http://localhost:8000` by default. Update the API base URL in `src/services/api.ts` if needed.
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Running the Application
+
+### Development Mode
+
+```bash
+npm run dev
 ```
+
+The application will be available at http://localhost:5173
+
+### Build for Production
+
+```bash
+npm run build
+```
+
+The production build will be in the `dist/` directory.
+
+### Preview Production Build
+
+```bash
+npm run preview
+```
+
+## Application Structure
+
+```
+frontend/
+├── src/
+│   ├── components/          # React components
+│   │   ├── Questionnaire.tsx
+│   │   ├── ApplicabilityResults.tsx
+│   │   ├── LOESummary.tsx
+│   │   └── ...
+│   ├── pages/              # Page-level components
+│   │   ├── ProjectsPage.tsx
+│   │   ├── ProjectAssessmentPage.tsx
+│   │   ├── ProjectResultsPage.tsx
+│   │   └── LOESummaryPage.tsx
+│   ├── services/           # API service layer
+│   │   └── api.ts
+│   ├── types/              # TypeScript type definitions
+│   │   └── api.ts
+│   ├── App.tsx             # Root component
+│   ├── main.tsx           # Entry point
+│   └── index.css          # Global styles
+├── public/                # Static assets
+├── package.json
+└── vite.config.ts         # Vite configuration
+```
+
+## Key Features
+
+### 1. Project Assessment Workflow
+
+1. **Create Project**: User creates a new project
+2. **Answer Questions**: Complete the assessment questionnaire
+3. **View Results**: See which review areas apply
+4. **Review LOE**: Check estimated hours breakdown
+5. **Export Workbook**: Download Excel file for audit work
+
+### 2. Excel Workbook Export
+
+The application can generate Excel workbooks with:
+- One tab per applicable section
+- Questions with sub-area IDs
+- Indicators of Compliance
+- Pre-formatted audit columns (Compliant, Non-Compliant, N/A, etc.)
+- Proper chapter numbering
+
+Access via "Generate Scoping Workbook" button on results page.
+
+### 3. LOE Summary
+
+Visual breakdown showing:
+- Total estimated hours per section
+- Number of applicable sub-areas
+- Number of indicators of compliance
+- Average confidence scores
+
+## API Integration
+
+The frontend communicates with the FastAPI backend through the `ApiService` class in `src/services/api.ts`.
+
+### Main API Methods:
+
+- `getQuestions()` - Fetch assessment questions
+- `createProject()` - Create new project
+- `submitProjectAnswers()` - Submit answers and calculate applicability
+- `getProjectApplicableSubAreas()` - Get assessment results
+- `getProjectLOESummary()` - Get LOE breakdown
+- `exportProjectWorkbook()` - Download Excel workbook
+
+## Development
+
+### Adding New Features
+
+1. Create component in `src/components/`
+2. Add types to `src/types/api.ts`
+3. Add API methods to `src/services/api.ts`
+4. Update routing in `App.tsx`
+
+### Code Quality
+
+```bash
+# Run linter
+npm run lint
+
+# Type check
+npx tsc --noEmit
+```
+
+## Deployment
+
+### Environment Variables
+
+For production, configure:
+- API base URL (if different from default)
+- Any feature flags
+
+### Build Process
+
+```bash
+npm run build
+```
+
+Deploy the `dist/` folder to your hosting platform (Netlify, Vercel, etc.).
+
+### CORS Configuration
+
+Ensure the backend's `ALLOWED_ORIGINS` environment variable includes your frontend URL.
+
+## Browser Support
+
+- Chrome (latest)
+- Firefox (latest)
+- Safari (latest)
+- Edge (latest)
+
+## License
+
+Proprietary - FTA Comprehensive Review Application

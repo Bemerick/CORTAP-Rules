@@ -9,6 +9,7 @@ RESTful API for FTA Comprehensive Review Applicability Assessment and Level of E
 - **Project Management**: Create, update, and manage review projects
 - **Applicability Assessment**: Determine which sub-areas apply based on answers
 - **LOE Calculation**: Automatic calculation of review hours
+- **Excel Workbook Export**: Generate audit-ready Excel workbooks from assessment results
 - **Database-Driven**: PostgreSQL with SQLAlchemy ORM
 
 ## Tech Stack
@@ -18,6 +19,7 @@ RESTful API for FTA Comprehensive Review Applicability Assessment and Level of E
 - **PostgreSQL**: Database
 - **Pydantic**: Data validation
 - **Uvicorn**: ASGI server
+- **openpyxl**: Excel file generation
 
 ## Installation
 
@@ -109,6 +111,7 @@ The API will be available at:
 - `POST /api/projects/{id}/answers` - Submit answers & calculate applicability
 - `GET /api/projects/{id}/applicable-sub-areas` - Get applicable sub-areas
 - `GET /api/projects/{id}/loe-summary` - Get LOE summary for project
+- `GET /api/projects/{id}/export-workbook` - Export project as Excel workbook
 
 ### Assessment
 
@@ -185,6 +188,9 @@ backend/
 │   │   ├── sub_area.py
 │   │   ├── project.py
 │   │   └── assessment.py
+│   ├── services/               # Business logic services
+│   │   ├── __init__.py
+│   │   └── workbook_generator.py
 │   └── routers/                # API endpoints
 │       ├── __init__.py
 │       ├── questions.py
